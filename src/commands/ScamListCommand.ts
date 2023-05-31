@@ -1,13 +1,14 @@
 import { Discord, Guild, Slash, SlashGroup, SlashOption } from 'discordx'
 import { ApplicationCommandOptionType, CommandInteraction } from 'discord.js'
 import configuration from '../../configuration.js'
-import { InteractionReplier, NAME_REGEX, SNOWFLAKE_REGEX, SUCCESS_EMBED, UUID_REGEX } from '../utils/misc.js'
+import { InteractionReplier, NAME_REGEX, SNOWFLAKE_REGEX, UUID_REGEX } from '../utils/misc.js'
 import { getNameForUuid, getUuidForName } from '../utils/mojang.js'
 import { addScammer, forceRemoveScammer, getScammer, removeScammer, updateScammer } from '../database/Scammer.js'
 import { notifyAllAdd, notifyAllForceRemove, notifyAllRemove } from '../database/GuildOptions.js'
 import {
   INVALID_DISCORD_ID_EMBED,
   INVALID_UUID_OR_NAME_EMBED,
+  SCAMMER_ACTION_RESPONSE_EMBED,
   SCAMMER_ALREADY_IN_LIST_EMBED,
   SCAMMER_NOT_IN_LIST_EMBED,
   UNKNOWN_ERROR_EMBED,
@@ -18,9 +19,9 @@ import {
 @SlashGroup({
   name: 'scamlist',
   nameLocalizations: {
-    'en-US': 'scamlist',
-    'en-GB': 'scamlist',
-    'fr': 'scamlist',
+    'en-US': 'scam-list',
+    'en-GB': 'scam-list',
+    'fr': 'liste-des-arnaqueurs',
   },
   description: 'Commands related to the scam list',
   descriptionLocalizations: {
@@ -132,13 +133,10 @@ export default class ScamListCommand {
 
     try {
       if (await getScammer(uuidOrName, true) || await getScammer(discordId, true))
-        return await replier.replyEmbed(SCAMMER_ALREADY_IN_LIST_EMBED)
+        return await replier.replyEmbed(SCAMMER_ALREADY_IN_LIST_EMBED(name))
       const scammer = await addScammer(uuid, name, discordId, interaction.user.id, reason, proof)
       await notifyAllAdd(interaction.client, scammer)
-      return await replier.replyEmbed({
-        ...configuration.messages.actions.scammerAdded,
-        ...SUCCESS_EMBED,
-      })
+      return await replier.replyEmbed(SCAMMER_ACTION_RESPONSE_EMBED(scammer.initialName, configuration.messages.actions.scammerAdded))
     } catch (error) {
       console.error(error)
       return await replier.replyEmbed(UNKNOWN_ERROR_EMBED)
@@ -204,10 +202,7 @@ export default class ScamListCommand {
     try {
       await removeScammer(scammerToRemove.uuid, reason)
       await notifyAllRemove(interaction.client, scammerToRemove)
-      return await replier.replyEmbed({
-        ...configuration.messages.actions.scammerRemoved,
-        ...SUCCESS_EMBED,
-      })
+      return await replier.replyEmbed(SCAMMER_ACTION_RESPONSE_EMBED(scammerToRemove.initialName, configuration.messages.actions.scammerRemoved))
     } catch (error) {
       console.error(error)
       return await replier.replyEmbed(UNKNOWN_ERROR_EMBED)
@@ -308,10 +303,7 @@ export default class ScamListCommand {
 
     try {
       await updateScammer(scammerToEdit.uuid, addReason, removeReason, proof)
-      return await replier.replyEmbed({
-        ...configuration.messages.actions.scammerEdited,
-        ...SUCCESS_EMBED,
-      })
+      return await replier.replyEmbed(SCAMMER_ACTION_RESPONSE_EMBED(scammerToEdit.initialName, configuration.messages.actions.scammerEdited))
     } catch (error) {
       console.error(error)
       return await replier.replyEmbed(UNKNOWN_ERROR_EMBED)
@@ -361,10 +353,7 @@ export default class ScamListCommand {
     try {
       await forceRemoveScammer(scammerToRemove.uuid)
       await notifyAllForceRemove(interaction.client, scammerToRemove)
-      return await replier.replyEmbed({
-        ...configuration.messages.actions.scammerForceRemoved,
-        ...SUCCESS_EMBED,
-      })
+      return await replier.replyEmbed(SCAMMER_ACTION_RESPONSE_EMBED(scammerToRemove.initialName, configuration.messages.actions.scammerForceRemoved))
     } catch (error) {
       console.error(error)
       return await replier.replyEmbed(UNKNOWN_ERROR_EMBED)

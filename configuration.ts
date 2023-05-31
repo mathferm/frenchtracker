@@ -11,7 +11,7 @@ export default {
       invalidUuidOrName: 'UUID ou pseudo invalide',
       invalidDiscordId: 'ID Discord invalide',
       invalidUuidOrNameOrDiscordId: 'UUID, pseudo ou ID Discord invalide',
-      scammerAlreadyInList: 'L\'arnaqueur est déjà dans la liste des arnaqueurs',
+      scammerAlreadyInList: '%scammer% est déjà dans la liste des arnaqueurs',
       scammerNotInList: 'L\'arnaqueur n\'est pas dans la liste des arnaqueurs',
       cannotFindCentralServer: 'Impossible de joindre le serveur central',
       cannotFindGuild: 'Impossible de trouver le serveur d\'exécution',
@@ -21,19 +21,19 @@ export default {
     actions: {
       scammerAdded: {
         title: 'Arnaqueur ajouté',
-        description: 'L\'arnaqueur a été ajouté à la liste des arnaqueurs',
+        description: '%scammer% a été ajouté à la liste des arnaqueurs',
       },
       scammerRemoved: {
         title: 'Arnaqueur retiré',
-        description: 'L\'arnaqueur a été retiré de la liste des arnaqueurs',
+        description: '%scammer% a été retiré de la liste des arnaqueurs',
       },
       scammerEdited: {
         title: 'Arnaqueur modifié',
-        description: 'L\'arnaqueur a été modifié',
+        description: '%scammer% a été modifié',
       },
       scammerForceRemoved: {
         title: 'Arnaqueur retiré de force',
-        description: 'L\'arnaqueur a été retiré de force de la liste des arnaqueurs',
+        description: '%scammer% a été retiré de force de la liste des arnaqueurs',
       },
     },
     notifications: {

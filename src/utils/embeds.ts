@@ -1,74 +1,65 @@
 import configuration from '../../configuration.js'
+import { SUCCESS_EMBED } from './misc.js'
 
-export const ERROR_EMBED = {
+export const ERROR_EMBED = ({
   title: configuration.messages.error.error,
   color: configuration.colors.error,
-} as const
+}) as const
 
-export const INFO_EMBED = {
+export const INFO_EMBED = ({
   color: configuration.colors.info,
-}
+}) as const
 
-export const UNKNOWN_ERROR_EMBED = {
+export const UNKNOWN_ERROR_EMBED = ({
   description: configuration.messages.error.unknownError,
   ...ERROR_EMBED,
-} as const
+}) as const
 
-export const CANNOT_FIND_CENTRAL_SERVER_EMBED = {
+export const CANNOT_FIND_CENTRAL_SERVER_EMBED = ({
   description: configuration.messages.error.cannotFindCentralServer,
   ...ERROR_EMBED,
-} as const
+}) as const
 
-export const CANNOT_FIND_GUILD_EMBED = {
+export const CANNOT_FIND_GUILD_EMBED = ({
   description: configuration.messages.error.cannotFindGuild,
   ...ERROR_EMBED,
-} as const
+}) as const
 
-export const SCAMMER_NOT_IN_LIST_EMBED = {
+export const SCAMMER_NOT_IN_LIST_EMBED = ({
   description: configuration.messages.error.scammerNotInList,
   ...ERROR_EMBED,
-} as const
+}) as const
 
-export const INVALID_UUID_OR_NAME_EMBED = {
+export const INVALID_UUID_OR_NAME_EMBED = ({
   description: configuration.messages.error.invalidUuidOrName,
   ...ERROR_EMBED,
-} as const
+}) as const
 
-export const INVALID_DISCORD_ID_EMBED = {
+export const INVALID_DISCORD_ID_EMBED = ({
   description: configuration.messages.error.invalidDiscordId,
   ...ERROR_EMBED,
-} as const
-export const SCAMMER_ALREADY_IN_LIST_EMBED = {
-  description: configuration.messages.error.scammerAlreadyInList,
+}) as const
+export const SCAMMER_ALREADY_IN_LIST_EMBED = (name: string) => ({
+  description: configuration.messages.error.scammerAlreadyInList.replace('%scammer%', name),
   ...ERROR_EMBED,
-} as const
+}) as const
 
-export function SCAMMER_ADDED_EMBED(name: string, id: string | null = null) {
-  return {
-    title: configuration.messages.notifications.scammerAdded.title,
-    description: configuration.messages.notifications.scammerAdded.description.replace('%scammer%', name),
-    footer: id ? {
-      text: id,
-    } : undefined,
-    ...INFO_EMBED,
-  } as const
-}
+export const SCAMMER_NOTIFICATION_EMBED = (name: string, {
+  title, description,
+}: { title: string, description: string }, id: string | null = null) => ({
+  title,
+  description: description?.replace('%scammer%', name),
+  footer: id ? {
+    text: id,
+  } : undefined,
+  ...INFO_EMBED,
+}) as const
 
-export function SCAMMER_REMOVED_EMBED(name: string, id: string | null = null) {
-  return {
-    title: configuration.messages.notifications.scammerRemoved.title,
-    description: configuration.messages.notifications.scammerRemoved.description.replace('%scammer%', name),
-    footer: id ? {
-      text: id,
-    } : undefined,
-    ...INFO_EMBED,
-  } as const
-}
-
-export function SCAMMER_FORCE_REMOVED_EMBED(name: string) {
-  return {
-    title: configuration.messages.notifications.scammerForceRemoved.title,
-    description: configuration.messages.notifications.scammerForceRemoved.description.replace('%scammer%', name),
-    ...INFO_EMBED,
-  } as const
-}
+export const SCAMMER_ACTION_RESPONSE_EMBED = (name: string, {title, description}: {
+  title: string,
+  description: string
+}) => ({
+  title,
+  description: description?.replace('%scammer%', name),
+  ...SUCCESS_EMBED,
+}) as const

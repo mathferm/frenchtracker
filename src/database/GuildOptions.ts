@@ -4,7 +4,8 @@ import Scammer from './Scammer.js'
 import { ActionRowBuilder, ButtonBuilder, Client } from 'discord.js'
 import { ManualBanButton } from '../buttons/ManualBanButton.js'
 import { banScammerFromGuild, getChannelForId, unBanScammerFromGuild } from '../utils/discord.js'
-import { SCAMMER_ADDED_EMBED, SCAMMER_FORCE_REMOVED_EMBED, SCAMMER_REMOVED_EMBED } from '../utils/embeds.js'
+import { SCAMMER_NOTIFICATION_EMBED } from '../utils/embeds.js'
+import configuration from '../../configuration.js'
 
 @Entity()
 export default class GuildOptions {
@@ -61,7 +62,7 @@ export async function notifyAllAdd(client: Client<true>, addedScammer: Scammer) 
 
     if (logChannel?.isTextBased())
       await logChannel.send({
-        embeds: [SCAMMER_ADDED_EMBED(addedScammer.initialName, (!guildOption.autoBan ? addedScammer.discordId : null))],
+        embeds: [SCAMMER_NOTIFICATION_EMBED(addedScammer.initialName, configuration.messages.notifications.scammerAdded, (!guildOption.autoBan ? addedScammer.discordId : null))],
         components: (!guildOption.autoBan ? [new ActionRowBuilder<ButtonBuilder>({
           components: [ManualBanButton.MANUAL_BAN_BUTTON],
         })] : []),
@@ -83,7 +84,7 @@ export async function notifyAllRemove(client: Client<true>, removedScammer: Scam
 
     if (logChannel?.isTextBased())
       await logChannel.send({
-        embeds: [SCAMMER_REMOVED_EMBED(removedScammer.initialName, (!guildOption.autoBan ? removedScammer.discordId : null))],
+        embeds: [SCAMMER_NOTIFICATION_EMBED(removedScammer.initialName, configuration.messages.notifications.scammerRemoved, (!guildOption.autoBan ? removedScammer.discordId : null))],
         components: (!guildOption.autoBan ? [new ActionRowBuilder<ButtonBuilder>({components: [ManualBanButton.MANUAL_UNBAN_BUTTON]})] : []),
       })
 
@@ -103,7 +104,7 @@ export async function notifyAllForceRemove(client: Client<true>, removedScammer:
 
     if (logChannel?.isTextBased())
       await logChannel.send({
-        embeds: [SCAMMER_FORCE_REMOVED_EMBED(removedScammer.initialName)],
+        embeds: [SCAMMER_NOTIFICATION_EMBED(removedScammer.initialName, configuration.messages.notifications.scammerForceRemoved)],
       })
     await unBanScammerFromGuild(await partialGuild.fetch(), removedScammer)
   }
