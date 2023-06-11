@@ -3,9 +3,12 @@ import { ActionRowBuilder, ModalBuilder, ModalSubmitInteraction, TextInputBuilde
 import configuration from '../../configuration.js'
 import { InteractionReplier } from '../utils/misc.js'
 import { getScammer } from '../database/Scammer.js'
-import { getNameForUuid } from '../utils/mojang.js'
-import { CANNOT_FIND_GUILD_EMBED, SCAMMER_NOT_IN_LIST_EMBED } from '../utils/embeds.js'
+import { getNameForUuid, getUuidForName } from '../utils/mojang.js'
+import { CANNOT_FIND_GUILD_EMBED } from '../utils/embeds.js'
 import { dateToDiscordTimeStamp } from '../utils/discord.js'
+import { getskyblocklvl,getguild,online,discordfromignmc } from '../utils/stats.js'
+//import { idtonamediscord } from '../utils/stats.js'
+//import { namefromiddiscord } from '../main.js'
 
 @Discord()
 export class CheckModal {
@@ -41,13 +44,46 @@ export class CheckModal {
     if (!interaction.guild)
       return await replier.replyEmbed(CANNOT_FIND_GUILD_EMBED)
 
-    if (!scammer)
-      return await replier.replyEmbed(SCAMMER_NOT_IN_LIST_EMBED)
+    if (!scammer){
+      const uuid=await getUuidForName(identifier)+""
+      return await replier.replyEmbed({
+        title:configuration.messages.scammer_not_found.titre_embed,
+        url:"https://sky.shiiyu/moe/stats/"+identifier,
+        thumbnail:{url:'https://crafatar.com/renders/body/'+uuid+".png"},
+        description:configuration.messages.scammer_not_found.message_description,
+        fields:[{
+          name:configuration.messages.scammer_found.soustitre_level,
+          value:await getskyblocklvl(identifier),
+        },
+        {
+          name:configuration.messages.scammer_found.soustitre_guild,
+          value:await getguild(identifier),
+        },
+        {
+          name:configuration.messages.scammer_found.soustutre_discord,
+          value:  await discordfromignmc(identifier)+" "
+        },
+        {
+          name:"\n",
+          value:await online(uuid)+"connecté sur hypixel"
+        }
+        ],
+      })}
 
+    const name=(await getNameForUuid(scammer.uuid)) ?? configuration.messages.error.cannotFindCurrentName
     return await replier.replyEmbed({
-      title: (await getNameForUuid(scammer.uuid)) ?? configuration.messages.error.cannotFindCurrentName,
-      description: (
-          !scammer.removedAt ?
+      //title: (await getNameForUuid(scammer.uuid)) ?? configuration.messages.error.cannotFindCurrentName,
+      title: configuration.messages.scammer_found.titre_emebd,
+      url:"https://sky.shiiyu/moe/stats/"+name,
+      //title: `[$(Information du joueur : (https://sky.shiiyu.moe/stats/${name})`,
+      thumbnail:{url:'https://crafatar.com/renders/body/'+scammer.uuid+".png"},
+      description:configuration.messages.scammer_found.message_description+"\n\n"+
+
+      configuration.messages.scammer_found.soustitre_scam_list+"\n"+
+      //}],
+      //description: (
+          "**"+name+"**\n\n"+
+          (!scammer.removedAt ?
             `Ajouté le ${dateToDiscordTimeStamp(scammer.addedAt)}\n` +
             `par <@${scammer.adderDiscordId}> (${scammer.adderDiscordId})\n` +
             `pour: ${scammer.addReason}`
@@ -59,7 +95,24 @@ export class CheckModal {
         `Pseudo initial: ${scammer.initialName}\n` +
         `UUID: ${scammer.uuid}\n` +
         `Discord: <@${scammer.discordId}> (${scammer.discordId})`,
-    }, {
+    fields:[{
+      name:configuration.messages.scammer_found.soustitre_level,
+      value:await getskyblocklvl(name),
+    },
+    {
+      name:configuration.messages.scammer_found.soustitre_guild,
+      value:await getguild(name),
+    },
+    /*{
+      name:configuration.messages.scammer_found.soustutre_discord,
+      value:await namefromiddiscord(scammer.discordId)
+    },*/
+    {
+      name:"\n",
+      value:await online(scammer.uuid)+"connecté sur hypixel"
+    }
+    ],
+  }, {
       files: scammer.proof ? [
         {
           name: 'preuves.txt',
