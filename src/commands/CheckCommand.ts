@@ -3,6 +3,7 @@ import { ActionRowBuilder, ButtonBuilder, CommandInteraction, EmbedBuilder } fro
 import configuration from '../../configuration.js'
 import { InteractionReplier } from '../utils/misc.js'
 import { CheckButton } from '../buttons/CheckButton.js'
+import { ReportButton } from '../buttons/ReportButton.js'
 import { CANNOT_FIND_GUILD_EMBED, UNKNOWN_ERROR_EMBED } from '../utils/embeds.js'
 
 @Discord()
@@ -52,7 +53,7 @@ export class CheckCommand {
       return await replier.replyEmbed(UNKNOWN_ERROR_EMBED)
 
     return await replier.replyEmbed(CheckCommand.CHECK_EMBED.toJSON(), {
-      components: [new ActionRowBuilder<ButtonBuilder>({components: [CheckButton.CHECK_BUTTON]})],
+      components: [new ActionRowBuilder<ButtonBuilder>({components: [CheckButton.CHECK_BUTTON,ReportButton.ReportButton]})],
     })
   }
 }
