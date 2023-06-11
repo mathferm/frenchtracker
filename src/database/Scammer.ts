@@ -71,3 +71,19 @@ export async function removeScammer(uuid: string, removeReason?: string) {
 export async function forceRemoveScammer(uuid: string) {
   return getRepository().delete({uuid})
 }
+
+export async function scammerrembourse(identifier: string) {
+  const scammer = await getScammer(identifier);
+  if (scammer) {
+    let nouvelleaddreason = scammer.addReason;
+    const rembourseSuffix = " (Remboursé)";
+
+    if (nouvelleaddreason.includes(rembourseSuffix)) {
+      nouvelleaddreason = nouvelleaddreason.replace(rembourseSuffix, "");
+    } else {
+      nouvelleaddreason.replace(rembourseSuffix,"");
+    }
+
+    await updateScammer(scammer.uuid, nouvelleaddreason);
+  }
+}
