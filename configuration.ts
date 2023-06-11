@@ -11,6 +11,7 @@ export default {
       invalidUuidOrName: 'UUID ou pseudo invalide',
       invalidDiscordId: 'ID Discord invalide',
       invalidUuidOrNameOrDiscordId: 'UUID, pseudo ou ID Discord invalide',
+      proof_missing: 'Vous n\'avez pas inclu de preuve(s) de l\'arnaque',
       scammerAlreadyInList: '%scammer% est déjà dans la liste des arnaqueurs',
       scammerNotInList: 'L\'arnaqueur n\'est pas dans la liste des arnaqueurs',
       cannotFindCentralServer: 'Impossible de joindre le serveur central',
@@ -55,6 +56,7 @@ export default {
       },
     },
     report: {
+      buttonLabel:'Signaler un utilisateur',
       modal: {
         title: 'Signaler un arnaqueur',
         uuidOrName: {
@@ -66,9 +68,13 @@ export default {
           placeholder: '319498304259902730',
         },
         proof: {
-          label: 'Preuves à l\'encontre de l\'arnaqueur',
-          placeholder: 'Preuves obligatoires (ajouter des liens pour les vidéos, images, etc.)',
+          label: 'Explication de l\'arnaque',
+          placeholder: 'Décrivez ici l\'arnaque réalisée par le joueur et comment il la réalise',
         },
+        prooflink:{
+          label: 'Preuve(s) de l\'arnaque',
+          placeholder:'Lien(s) obligatoire(s) des preuves de l\'arnaque (images, vidéos...)',
+        }
       },
       logEmbed: {
         title: 'Signalement d\'un arnaqueur',
@@ -98,7 +104,8 @@ export default {
     check: {
       buttonLabel: 'Vérifier un utilisateur',
       embedDescription: 'Avec ce nouveau système, vous pouvez vérifier si un utilisateur est dans la liste des arnaqueurs\n\n\n' +
-        'Cliquez sur le bouton ci-dessous pour vérifier un utilisateur',
+        '🔍 Cliquez sur le bouton ci-dessous pour vérifier un joueur\n'+
+        '⚠️ Cliquez sur le bouton ci-dessous pour signaler un joueur',
       modal: {
         uuidOrNameOrDiscordId: {
           label: 'UUID, pseudo ou ID Discord de l\'utilisateur',
@@ -115,6 +122,45 @@ export default {
       proof: 'Pas de preuves renseignées',
     },
     reportSent: 'Votre signalement a bien été envoyé',
+    Ban_Menu:{
+      option1:'Ajouter à la scamlist',
+      option2:'Manque d\'information',
+      option3:'Joueur inexistant',
+      option4:'Autre'
+    },
+    reponse_signalement:{
+      titre:'Suivi du signalement de scam du joueur "%scammer%"\n\n\n',
+      refus_manque_preuve: "Nous avons refusé votre signalement à cause d'un manque de preuve et d'information",
+      refus_joueur_innexistant: "Nous avons refusé votre signalement car le joueur que vous avez signalé n'existe pas",
+      accepte:"Nous avons ajouté le joueur %scammer% dans notre base de donnée, merci à vous"
+    },
+    scammer_found:{
+      titre_emebd:"Information du joueur :",
+      message_description:"Nous te conseillons de ne pas trade avec lui. Si jamais tu penses que c'est une erreur, va voir le staff d'un de nos serveurs Discord partenaires",
+      soustitre_scam_list:"__**· Scamlist :**__",
+      soustitre_level:"__**· Level :\n**__",
+      soustitre_guild:"__**· Guilde :\n**__",
+      soustutre_discord:"__**· Discord\n**__"
+    },
+    scammer_not_found:{
+      titre_embed:"Information du joueur :",
+      message_description:"Si jamais tu te fais arnaquer, va voir le staff d'un de nos serveurs Discord partenaires\n",
+    },
+    rembourse:"Ce joueur est désormais marque comme ayant remboursé son scam",
+    ReturnReport:{
+      Informationmissing:"Le joueur %joueur% a bien été informé du manque d'information du signalement",
+      Joueurinnexistant:"Le joueur %joueur% a bien été informé du fait que le joueur n'existe pas",
+      custommessagereply:"Le joueur %joueur% a bien reçu le message",
+      Ban:'Le joueur %joueur% a bien été informé que son report a donné suite à un ban',
+      customMessage:{
+        title:"Envoyer un message définis",
+        description:{
+          label:'Texte à envoyer',
+          placeholder:'Merci pour le signalement, nous l\'avons déjà bannis'
+        }
+      }
+    },
+    absencedeprofit:'Ce joueur n\' a pas les api ouvertes sur cette statistique ou n\'a jamais joué au skyblock'
   },
   database: { // Voir https://typeorm.io/data-source-options#common-data-source-options
     type: 'better-sqlite3',
@@ -123,6 +169,12 @@ export default {
   colors: {
     error: 0xFF0000,
     success: 0x00FF00,
+    info: 0x0000FF,
+    neutral: 0x808080,
+  },
+  API: {
+    hypixelapi: "https://api.hypixel.net/",
+    hypixelkey:"",
     info: 0x0000FF,
     neutral: 0x808080,
   },
