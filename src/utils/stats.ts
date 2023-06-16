@@ -13,6 +13,7 @@ async function currentprofile(data:any){
             return(profile)
         }
     }}
+    return(1)
 }
 
 export async function getskyblocklvl(name :string){
