@@ -49,7 +49,15 @@ export async function getScammer(identifier: string, withDeleted = false) {
 
 export async function addScammer(uuid: string, initialName: string, discordId: string, reporterDiscordId: string, addReason?: string, proof?: string) {
   const repository = getRepository()
-
+  if (discordId==undefined){
+    discordId="unknown"
+  }
+  if (uuid==undefined){
+    uuid="unknown"
+  }
+  if (initialName==undefined){
+    initialName="unknown"
+  }
   return await repository.save(repository.create({
     uuid,
     initialName,
