@@ -73,3 +73,8 @@ export const SCAMMER_REMBOURSED = ({
   description: configuration.messages.rembourse,
   ...ERROR_EMBED,
 }) as const
+
+export const MISSING_UUID_OR_ID = ({
+  description: configuration.messages.error.missinguuid_or_discord_id,
+  ...ERROR_EMBED,
+}) as const
