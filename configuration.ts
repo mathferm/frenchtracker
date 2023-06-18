@@ -18,6 +18,7 @@ export default {
       cannotFindGuild: 'Impossible de trouver le serveur d\'exécution',
       cannotFindCurrentName: 'Impossible de récupérer le pseudo actuel',
       tooFewPermissions: 'Vous n\'avez pas les permissions nécessaires pour faire ceci',
+      missinguuid_or_discord_id:"Vous devez indiquez un username mc ou un identifiant discord",
     },
     actions: {
       scammerAdded: {
