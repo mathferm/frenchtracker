@@ -132,7 +132,7 @@ export default class ScamListCommand {
       return await replier.replyEmbed(INVALID_DISCORD_ID_EMBED)
 
     try {
-      if (await getScammer(uuidOrName, true) || await getScammer(discordId, true))
+      if (await getScammer(uuidOrName, true) && await getScammer(discordId, true))
         return await replier.replyEmbed(SCAMMER_ALREADY_IN_LIST_EMBED(name))
       const scammer = await addScammer(uuid, name, discordId, interaction.user.id, reason, proof)
       await notifyAllAdd(interaction.client, scammer)
@@ -142,6 +142,190 @@ export default class ScamListCommand {
       return await replier.replyEmbed(UNKNOWN_ERROR_EMBED)
     }
   }
+
+//fin de commande pour add normalement
+
+  @SlashGroup('scamlist') 
+  @Slash({
+    name: 'add_ratter',
+    nameLocalizations: {
+      'en-US': 'add_ratter',
+      'en-GB': 'add_ratter',
+      'fr': 'ajouter_ratter',
+    },
+    description: 'Add a ratter to the scam list',
+    descriptionLocalizations: {
+      'en-US': 'Add a ratter to the scam list',
+      'en-GB': 'Add a ratter to the scam list',
+      'fr': 'Ajouter un ratter à la liste des arnaqueurs',
+    },
+  })
+  async add_ratter(
+    @SlashOption({
+      type: ApplicationCommandOptionType.String,
+      name: 'discord-id',
+      nameLocalizations: {
+        'en-US': 'discord-id',
+        'en-GB': 'discord-id',
+        'fr': 'id-discord',
+      },
+      description: 'The Discord ID of the scammer',
+      descriptionLocalizations: {
+        'en-US': 'The Discord ID of the scammer',
+        'en-GB': 'The Discord ID of the scammer',
+        'fr': 'L\'ID Discord de l\'arnaqueur',
+      },
+      required: true,
+    }) discordId: string,
+    @SlashOption({
+      type: ApplicationCommandOptionType.String,
+      name: 'reason',
+      nameLocalizations: {
+        'en-US': 'reason',
+        'en-GB': 'reason',
+        'fr': 'raison',
+      },
+      description: 'The reason of the scam',
+      descriptionLocalizations: {
+        'en-US': 'The reason of their addition to the scam list',
+        'en-GB': 'The reason of their addition to the scam list',
+        'fr': 'La raison de son ajout à la liste des arnaqueurs',
+      },
+      required: false,
+    }) reason: string | undefined,
+    @SlashOption({
+      type: ApplicationCommandOptionType.String,
+      name: 'proof',
+      nameLocalizations: {
+        'en-US': 'proof',
+        'en-GB': 'proof',
+        'fr': 'preuves',
+      },
+      description: 'The proof of the scam',
+      descriptionLocalizations: {
+        'en-US': 'The proof of the scam',
+        'en-GB': 'The proof of the scam',
+        'fr': 'Les preuves de l\'arnaque',
+      },
+      required: false,
+    }) proof: string | undefined,
+    interaction: CommandInteraction,
+  ) {
+    const replier = new InteractionReplier(interaction, true)
+    await replier.defer()
+
+    if (!SNOWFLAKE_REGEX.test(discordId))
+      return await replier.replyEmbed(INVALID_DISCORD_ID_EMBED)
+
+    try {
+      if ( await getScammer(discordId, true))
+        return await replier.replyEmbed(SCAMMER_ALREADY_IN_LIST_EMBED(discordId))
+      const scammer = await addScammer("inconnue", "inconnue", discordId, interaction.user.id, reason, proof)
+      await notifyAllAdd(interaction.client, scammer)
+      return await replier.replyEmbed(SCAMMER_ACTION_RESPONSE_EMBED(scammer.initialName, configuration.messages.actions.scammerAdded))
+    } catch (error) {
+      console.error(error)
+      return await replier.replyEmbed(UNKNOWN_ERROR_EMBED)
+    }
+  }
+
+
+//fin commande pour add un ratter
+@SlashGroup('scamlist')
+@Slash({
+  name: 'add_without_discord',
+  nameLocalizations: {
+    'en-US': 'add_without_discord',
+    'en-GB': 'add_without_discord',
+    'fr': 'ajouter_sans_pseudo_discord',
+  },
+  description: 'Add a scammer to the scam list',
+  descriptionLocalizations: {
+    'en-US': 'Add a scammer to the scam list',
+    'en-GB': 'Add a scammer to the scam list',
+    'fr': 'Ajouter un arnaqueur à la liste des arnaqueurs',
+  },
+})
+async add_without_discord(
+  @SlashOption({
+    type: ApplicationCommandOptionType.String,
+    name: 'uuid-or-name',
+    nameLocalizations: {
+      'en-US': 'uuid-or-name',
+      'en-GB': 'uuid-or-name',
+      'fr': 'uuid-ou-pseudo',
+    },
+    description: 'The in-game name of the scammer or their UUID',
+    descriptionLocalizations: {
+      'en-US': 'The in-game name of the scammer or their UUID',
+      'en-GB': 'The in-game name of the scammer or their UUID',
+      'fr': 'Le pseudo de l\'arnaqueur ou son UUID',
+    },
+    required: true,
+  }) uuidOrName: string,
+  @SlashOption({
+    type: ApplicationCommandOptionType.String,
+    name: 'reason',
+    nameLocalizations: {
+      'en-US': 'reason',
+      'en-GB': 'reason',
+      'fr': 'raison',
+    },
+    description: 'The reason of the scam',
+    descriptionLocalizations: {
+      'en-US': 'The reason of their addition to the scam list',
+      'en-GB': 'The reason of their addition to the scam list',
+      'fr': 'La raison de son ajout à la liste des arnaqueurs',
+    },
+    required: false,
+  }) reason: string | undefined,
+  @SlashOption({
+    type: ApplicationCommandOptionType.String,
+    name: 'proof',
+    nameLocalizations: {
+      'en-US': 'proof',
+      'en-GB': 'proof',
+      'fr': 'preuves',
+    },
+    description: 'The proof of the scam',
+    descriptionLocalizations: {
+      'en-US': 'The proof of the scam',
+      'en-GB': 'The proof of the scam',
+      'fr': 'Les preuves de l\'arnaque',
+    },
+    required: false,
+  }) proof: string | undefined,
+  interaction: CommandInteraction,
+) {
+  const replier = new InteractionReplier(interaction, true)
+  await replier.defer()
+  const isUuid = UUID_REGEX.test(uuidOrName)
+  const isName = NAME_REGEX.test(uuidOrName)
+
+  if (!isUuid && !isName)
+    return await replier.replyEmbed(INVALID_UUID_OR_NAME_EMBED)
+
+  const uuid = isUuid ? uuidOrName : await getUuidForName(uuidOrName)
+  const name = isName ? uuidOrName : await getNameForUuid(uuidOrName)
+
+  if (!uuid || !name)
+    return await replier.replyEmbed(INVALID_UUID_OR_NAME_EMBED)
+
+
+  try {
+    if (await getScammer(uuidOrName, true))
+      return await replier.replyEmbed(SCAMMER_ALREADY_IN_LIST_EMBED(name))
+    const scammer = await addScammer(uuid, name, "unkown", interaction.user.id, reason, proof)
+    await notifyAllAdd(interaction.client, scammer)
+    return await replier.replyEmbed(SCAMMER_ACTION_RESPONSE_EMBED(scammer.initialName, configuration.messages.actions.scammerAdded))
+  } catch (error) {
+    console.error(error)
+    return await replier.replyEmbed(UNKNOWN_ERROR_EMBED)
+  }
+}
+
+//fin de la commande pour add qq sans pseudo discord
+
 
   @SlashGroup('scamlist')
   @Slash({
