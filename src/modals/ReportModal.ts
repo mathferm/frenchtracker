@@ -3,7 +3,7 @@ import { ActionRowBuilder, ModalBuilder, ModalSubmitInteraction, SelectMenuBuild
 import configuration from '../../configuration.js'
 import { InteractionReplier, NAME_REGEX, SUCCESS_EMBED, UUID_REGEX } from '../utils/misc.js'
 import { getChannelForId, getGuildForId } from '../utils/discord.js'
-import { CANNOT_FIND_CENTRAL_SERVER_EMBED, INVALID_UUID_OR_NAME_EMBED, INVALID_PROOF } from '../utils/embeds.js'
+import { CANNOT_FIND_CENTRAL_SERVER_EMBED, INVALID_UUID_OR_NAME_EMBED, INVALID_PROOF, MISSING_UUID_OR_ID } from '../utils/embeds.js'
 import { getNameForUuid, getUuidForName } from '../utils/mojang.js'
 import { GetText } from '../menu_deroulant/getcustomtext.js'
 import { addScammer } from '../database/Scammer.js'
@@ -21,7 +21,7 @@ export class ReportModal {
           new TextInputBuilder({
             customId: 'report-uuid-or-username',
             style: TextInputStyle.Short,
-            required: true,
+            required: false,
             maxLength: 32,
             minLength: 3,
             ...configuration.messages.report.modal.uuidOrName,
@@ -33,7 +33,7 @@ export class ReportModal {
           new TextInputBuilder({
             customId: 'report-discord-id',
             style: TextInputStyle.Short,
-            required: true,
+            required: false,
             ...configuration.messages.report.modal.discordId,
           }),
         ],
@@ -77,21 +77,36 @@ export class ReportModal {
       return await replier.replyEmbed(CANNOT_FIND_CENTRAL_SERVER_EMBED)
     }
 
-    const identifier = interaction.fields.getTextInputValue('report-uuid-or-username')
-    const discordId = interaction.fields.getTextInputValue('report-discord-id')
+    let identifier = interaction.fields.getTextInputValue('report-uuid-or-username')
+    let discordId = interaction.fields.getTextInputValue('report-discord-id')
     const proof = interaction.fields.getTextInputValue('report-proof')
     const prooflink = interaction.fields.getTextInputValue('report-links')
+    let name
+    let uuid
+    if (identifier==undefined && discordId==undefined){
+      return await replier.replyEmbed(MISSING_UUID_OR_ID)
+    }
+    if (identifier==undefined){
+      identifier="unknown"
+      uuid="unknown"
+      name="unknown"
+    }
+
+    if (discordId==undefined){
+      discordId="unknown"
+    }
 
     if (!prooflink.includes("https://")){
       return await replier.replyEmbed(INVALID_PROOF)
     }
-
-    const name = UUID_REGEX.test(identifier) ? await getNameForUuid(identifier) : identifier
-    const uuid = NAME_REGEX.test(identifier) ? await getUuidForName(identifier) : identifier
-
-    if (!uuid || !name)
-      return await replier.replyEmbed(INVALID_UUID_OR_NAME_EMBED)
-    if (!prooflink.includes("https://")){
+  if (identifier!="unknown"){
+    name = UUID_REGEX.test(identifier) ? await getNameForUuid(identifier) : identifier
+    uuid = NAME_REGEX.test(identifier) ? await getUuidForName(identifier) : identifier
+    if (!uuid || !name){
+      return await replier.replyEmbed(INVALID_UUID_OR_NAME_EMBED)}
+    }
+    
+      if (!prooflink.includes("https://")){
       return await replier.replyEmbed(INVALID_PROOF)
     }
     console.log(interaction.user.id)
@@ -127,13 +142,13 @@ export class ReportModal {
     reportsLogChannel.send({
       embeds: [{
         title: configuration.messages.report.logEmbed.title
-          .replaceAll('%scammerUuid%', uuid)
-          .replaceAll('%scammerName%', name)
+          .replaceAll('%scammerUuid%', uuid??"")
+          .replaceAll('%scammerName%', name??"")
           .replaceAll('%scammerId%', discordId)
           .replaceAll('%reporterId%', interaction.user.id),
         description: configuration.messages.report.logEmbed.description
-          .replaceAll('%scammerUuid%', uuid)
-          .replaceAll('%scammerName%', name)
+          .replaceAll('%scammerUuid%', uuid??"")
+          .replaceAll('%scammerName%', name??"")
           .replaceAll('%scammerId%', discordId)
           .replaceAll('%reporterId%', interaction.user.id),
         footer:({text:JSON.stringify({uuid:uuid,name:name,discordId:discordId,reporterid:interaction.user.id,reason:Buffer.from(proof),proof:Buffer.from(prooflink)})})
@@ -165,6 +180,19 @@ export class ReportModal {
                 title:configuration.messages.reponse_signalement.titre.replace("%scammer%",object.name),
                 description:configuration.messages.reponse_signalement.accepte.replace("%scammer%",object.name)}]
         })
+        const proof=Buffer.from(object.proof.data).toString("utf8")
+        const reason=Buffer.from(object.reason.data).toString("utf8")
+        if (object.uuid=="" || object.uuid=="unknown"){
+          await addScammer("unknown","unknown",object.discordID,object.reporterid,reason,proof)}
+        else{
+          if (object.discordID===""||object.discordID==="unknown"||object.discordId==undefined){
+            await addScammer(object.uuid,object.name,"unknown",object.reporterid,reason,proof)
+
+          }
+          else {
+            await addScammer(object.uuid,object.name,object.discordID,object.reporterid,reason,proof)
+          }
+        }
         await replier.replyEmbed({
           description:configuration.messages.ReturnReport.Ban.replace("%joueur%",player.username)
         })
@@ -176,7 +204,7 @@ export class ReportModal {
                 title:configuration.messages.reponse_signalement.titre.replace("%scammer%",object.name),
                 description:configuration.messages.reponse_signalement.refus_manque_preuve}]
         })
-        await addScammer(object.uuid,object.name,object.discordID,object.reporterid,object.reason,object.proof)
+
         await replier.replyEmbed({
           description:configuration.messages.ReturnReport.Informationmissing.replace("%joueur%",player.username)
         })
