@@ -158,12 +158,34 @@ export default {
         description:{
           label:'Texte à envoyer',
           placeholder:'Merci pour le signalement, nous l\'avons déjà bannis'
+        },
+        MessageLog:"Le joueur %player% a bien reçu le message %texte%"
+      },
+      newinfo:{
+        title:'Nouvelles informations',
+        descrption_pseduo:{
+          label:'Pseudo minecraft',
+          placeholder:"Pseudo minecraft"
+        },
+        description_discord:{
+          label:"Id discord",
+          placeholder:'Id Discord'
+        },
+        description_raison:{
+          label:"Raison",
+          placeholder:"Raison"
         }
       }
     },
+    listeserver:{
+      liste_serveur:"liste des serveurs",
+      notenoughperm:"Vous n'avez pas assez de permissions pour executer cette commande",
+      sucess:"Le bot a bien été enlevé du serveur %server%",
+      serverunfoundable:"le serveur %serveur% est introuvable",
+      nombre_serveur:"Actuallement le bot a rejoint :"
+    },
     absencedeprofit:'Ce joueur n\' a pas les api ouvertes sur cette statistique ou n\'a jamais joué au skyblock'
-  },
-  database: { // Voir https://typeorm.io/data-source-options#common-data-source-options
+  },base: { // Voir https://typeorm.io/data-source-options#common-data-source-options
     type: 'better-sqlite3',
     database: 'database.sqlite3',
   },
